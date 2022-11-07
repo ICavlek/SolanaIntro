@@ -21,13 +21,14 @@ import yaml from 'yaml';
 /*
 Path to Solana CLI config file.
 */
-const CONFIG_FILE_PATH = path.resolve(
+let CONFIG_FILE_PATH = path.resolve(
     os.homedir(),
     '.config',
     'solana',
     'cli',
     'config.yml',
 );
+CONFIG_FILE_PATH = '/home/ic1993/.config/solana/cli/config.yml';
 
 
 let connection: Connection;
@@ -54,12 +55,12 @@ export async function connect() {
 Use local keypair for client.
 */
 export async function getLocalAccount() {
-    const configYml = await fs.readFile(CONFIG_FILE_PATH, {encoding: 'utf8'});
+    const configYml = await fs.readFile(CONFIG_FILE_PATH, { encoding: 'utf8' });
     const keypairPath = await yaml.parse(configYml).keypair_path;
     localKeypair = await createKeypairFromFile(keypairPath);
     // const airdropRequest = await connection.requestAirdrop(
     //     localKeypair.publicKey,
-    //     LAMPORTS_PER_SOL*2,
+    //     LAMPORTS_PER_SOL * 2,
     // );
     // await connection.confirmTransaction(airdropRequest);
 
@@ -134,7 +135,7 @@ export async function pingProgram(programName: string) {
     console.log(`Pinging ${programName} program...`);
 
     const instruction = new TransactionInstruction({
-        keys: [{pubkey: clientPubKey, isSigner: false, isWritable: true}],
+        keys: [{ pubkey: clientPubKey, isSigner: false, isWritable: true }],
         programId,
         data: Buffer.alloc(0), // Empty instruction data
     });
