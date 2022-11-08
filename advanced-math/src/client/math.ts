@@ -10,6 +10,8 @@ import {
 } from '@solana/web3.js';
 import {
     createKeypairFromFile,
+    getStringForInstruction,
+    createCalculatorInstructions,
 } from './util';
 import fs from 'mz/fs';
 import os from 'os';
@@ -29,7 +31,6 @@ let CONFIG_FILE_PATH = path.resolve(
     'config.yml',
 );
 CONFIG_FILE_PATH = '/home/ic1993/.config/solana/cli/config.yml';
-
 
 let connection: Connection;
 let localKeypair: Keypair;
@@ -60,7 +61,7 @@ export async function getLocalAccount() {
     localKeypair = await createKeypairFromFile(keypairPath);
     // const airdropRequest = await connection.requestAirdrop(
     //     localKeypair.publicKey,
-    //     LAMPORTS_PER_SOL * 2,
+    //     LAMPORTS_PER_SOL*2,
     // );
     // await connection.confirmTransaction(airdropRequest);
 
@@ -89,7 +90,7 @@ export async function getProgram(programName: string) {
 Configure client account.
 */
 export async function configureClientAccount(accountSpaceSize: number) {
-    const SEED = 'test1';
+    const SEED = 'test7';
     clientPubKey = await PublicKey.createWithSeed(
         localKeypair.publicKey,
         SEED,
@@ -130,14 +131,22 @@ export async function configureClientAccount(accountSpaceSize: number) {
 /*
 Ping the program.
 */
-export async function pingProgram(programName: string) {
+export async function pingProgram(
+    operation: number, operatingValue: number) {
+
     console.log(`All right, let's run it.`);
-    console.log(`Pinging ${programName} program...`);
+    console.log(`Pinging our calculator program...`);
+
+    let calcInstructions = await createCalculatorInstructions(
+        operation, operatingValue
+    );
+
+    console.log(`We're going to ${await getStringForInstruction(operation, operatingValue)}`)
 
     const instruction = new TransactionInstruction({
         keys: [{ pubkey: clientPubKey, isSigner: false, isWritable: true }],
         programId,
-        data: Buffer.alloc(0), // Empty instruction data
+        data: calcInstructions,
     });
     await sendAndConfirmTransaction(
         connection,
@@ -157,5 +166,7 @@ export async function example(programName: string, accountSpaceSize: number) {
     await getLocalAccount();
     await getProgram(programName);
     await configureClientAccount(accountSpaceSize);
-    await pingProgram(programName);
+    await pingProgram(1, 4); // Add 4
+    await pingProgram(2, 1); // Subtract 1
+    await pingProgram(3, 2); // Multiply by 2
 }
