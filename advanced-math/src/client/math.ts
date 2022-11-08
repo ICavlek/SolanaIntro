@@ -90,7 +90,7 @@ export async function getProgram(programName: string) {
 Configure client account.
 */
 export async function configureClientAccount(accountSpaceSize: number) {
-    const SEED = 'test7';
+    const SEED = 'test1';
     clientPubKey = await PublicKey.createWithSeed(
         localKeypair.publicKey,
         SEED,
